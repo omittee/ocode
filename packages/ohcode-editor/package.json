@@ -1,0 +1,32 @@
+{
+  "name": "@omittee/ohcode-editor",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "files": [
+    "dist",
+    "index.d.ts"
+  ],
+  "main": "./dist/ohcode-editor.umd.cjs",
+  "module": "./dist/ohcode-editor.js",
+  "types": "./index.d.ts",
+  "exports": {
+    "types": "./index.d.ts",
+    "import": "./dist/ohcode-editor.js",
+    "require": "./dist/ohcode-editor.umd.cjs"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build"
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^25.0.7",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "typescript": "^5.2.2",
+    "vite": "^4.4.11"
+  },
+  "dependencies": {
+    "@omittee/ohcode-diff": "workspace:*",
+    "vite-plugin-wasm": "^3.2.2"
+  }
+}

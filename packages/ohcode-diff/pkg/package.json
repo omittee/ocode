@@ -1,0 +1,16 @@
+{
+  "name": "@omittee/ohcode-diff",
+  "version": "0.1.0",
+  "files": [
+    "ohcode_diff_bg.wasm",
+    "ohcode_diff.js",
+    "ohcode_diff_bg.js",
+    "ohcode_diff.d.ts"
+  ],
+  "module": "ohcode_diff.js",
+  "types": "ohcode_diff.d.ts",
+  "sideEffects": [
+    "./ohcode_diff.js",
+    "./snippets/*"
+  ]
+}
