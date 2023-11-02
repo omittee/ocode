@@ -1,37 +1,39 @@
 import { OhCodeOptions, DiffType } from "./types";
 import { OhCodeEle } from "./component/ohcode";
-
-const diffAlgorithm = import('@omittee/ohcode-diff');
-
-const { compute_diff } = await diffAlgorithm;
+import DiffWorker from './worker?worker'
 
 customElements.define('oh-code', OhCodeEle);
 
 export class OhCode {
   #option: OhCodeOptions;
   #map: Map<string, number> = new Map();
-  #srcLine: Uint32Array;
-  #tgtLine: Uint32Array;
 
   #box: HTMLElement;
   #scollBox: HTMLElement;
-  #lines: HTMLElement[]
+  #lines: HTMLElement[] = [];
 
-  #lineHeight: number;
+  #lineHeight: number = 20;
+
+  #worker: Worker
 
   constructor(option: OhCodeOptions) {
     const ohcode = document.createElement('oh-code');
     option.parent.appendChild(ohcode);
     this.#option = option;
-    this.#srcLine = Uint32Array.from(option.origin.map(s => this.#getHash(s)));
-    this.#tgtLine = Uint32Array.from(option.modified.map(s => this.#getHash(s)));
+    const srcLine = Uint32Array.from(option.origin.map(s => this.#getHash(s)));
+    const tgtLine = Uint32Array.from(option.modified.map(s => this.#getHash(s)));
     this.#box = ohcode.shadowRoot!.querySelector(".box")!;
     this.#scollBox = ohcode.shadowRoot!.querySelector(".scroll-box")!;
-    this.#lines = this.#geterateContent(compute_diff(this.#srcLine, this.#tgtLine));
-    this.#lineHeight = this.#scollBox.firstElementChild?.getBoundingClientRect().height ?? 20;
-    this.#adjustStyle();
-    this.#initContent();
-    this.#useScroll();
+
+    this.#worker = new DiffWorker();
+    this.#worker.onmessage = ({ data }) => {
+      this.#lines = this.#geterateContent(data);
+      this.#lineHeight = this.#scollBox.firstElementChild?.getBoundingClientRect().height ?? 20;
+      this.#adjustStyle();
+      this.#initContent();
+      this.#useScroll();
+    }
+    this.#worker.postMessage({ srcLine, tgtLine }, [srcLine.buffer, tgtLine.buffer]);
   }
 
   #getHash(s: string): number {
@@ -117,9 +119,4 @@ export class OhCode {
       requestAnimationFrame(callback)
     })
   }
-}
-
-
-export {
-  compute_diff
 }
